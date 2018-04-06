@@ -1,0 +1,6 @@
+flask==0.12.2
+flask-login==0.4.1
+flask_cors==3.0.3
+sqlalchemy==1.2.6
+flask-sqlalchemy==2.3.2
+psycopg2==2.7.4
