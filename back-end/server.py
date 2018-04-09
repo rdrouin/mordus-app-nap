@@ -9,47 +9,22 @@ from hashlib import md5
 from datetime import datetime
 from functools import wraps
 
+from user import db, User
+
+
 app = Flask(__name__)
+db.init_app(app)
+
 app.secret_key = 'super secret key'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postTrans@localhost:5432/postgres'
-db = SQLAlchemy(app)
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 CORS(app)
-
-class User(db.Model):
-    __tablename__ = "users"
-    id = db.Column('user_id',db.Integer , primary_key=True)
-    username = db.Column('username', db.String(20), unique=True , index=True)
-    password = db.Column('password' , db.String(10))
-    email = db.Column('email',db.String(50),unique=True , index=True)
-    registered_on = db.Column('registered_on' , db.DateTime)
-
-    def __init__(self , username ,password , email):
-        self.username = username
-        self.password = password
-        self.email = email
-        self.registered_on = datetime.utcnow()
-        self.access_token = "123"
-
-    def is_authenticated(self):
-        return True
-
-    def is_active(self):
-        return True
-
-    def is_anonymous(self):
-        return False
-
-    def get_id(self):
-        return chr(self.id)
-
-    def __repr__(self):
-        return '<User %r>' % (self.username)
 
 # TODO with postgresql
 h = md5()
