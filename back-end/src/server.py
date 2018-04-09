@@ -9,13 +9,14 @@ from hashlib import md5
 from datetime import datetime
 from functools import wraps
 from db import db
-from vol import Vol
-from airport import Airport
+from db_model.vol import Vol
+from db_model.airport import Airport
+from csvreader import csvreader
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postTrans@localhost:5432/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/postgres'
 db.init_app(app)
 
 
@@ -69,7 +70,6 @@ def load_user(id):
 
 @app.route('/')
 def index():
-    db.create_all()
     return "Hello, World!"
 
 @app.route('/assets', methods=['GET'])
@@ -84,7 +84,49 @@ def init_db():
 @app.route('/populate', methods=['GET'])
 def populate():
     init_db()
+    return redirect(url_for('index'))
     # populate all tables
+
+@app.route('/flights', methods=['GET'])
+def flights():
+    data = {'flights':[{'time':'5:30', 'flightNumber':'AC130', 'destination':'YPO'},
+    {'time':'6:30', 'flightNumber':'AB230', 'destination':'GHR'},
+    {'time':'6:40', 'flightNumber':'AS550', 'destination':'DSW'},
+    {'time':'6:55', 'flightNumber':'AG840', 'destination':'HGR'},
+    {'time':'7:10', 'flightNumber':'AW430', 'destination':'NBV'}]}
+
+    return jsonify(data)
+
+def get_user():
+    if 'Api_Access_Token' not in request.headers or 'Api_Username' not in request.headers:
+        return return_error()
+    else:
+        token = request.headers['Api_Access_Token']
+        username = request.headers['Api_Username']
+        return username
+    return None
+
+@app.route('/assign', methods=['GET', 'POST'])
+def assign():
+    user = get_user()
+    if request.method == 'GET':
+        data = {'flightCount':0}
+        data1 = {'flightCount':3}
+        data2 = {'flightCount':1}
+        if user=="1":
+            data = data1
+        elif user=="2":
+            data=data2
+        return jsonify(data)
+    elif request.method == 'POST':
+        print('POST')
+        for key in request.args:
+            print(key)
+        acceptedFlights = request.form['values']
+        print(acceptedFlights)
+        return jsonify({'data':'ok'})
+
+
 
 @app.route('/FlightCompany', methods=['GET'])
 def get_flightCompany():
@@ -120,28 +162,9 @@ def login():
 def return_error():
     return jsonify({'error': 'you do not have access'})
 
-def auth_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        """Check if api_access_token and api_username
-           headers are setted and check credentials
-        """
-        if 'api_access_token' not in request.headers or 'api_username' not in request.headers:
-            return return_error()
-        else:
-            token = request.headers['api_access_token']
-            username = request.headers['api_username']
-            try:
-                user = User.query.filter_by(username=username).first()
-                kwargs['user'] = user
-                return f(*args, **kwargs)
-            except Exception as error:
-                #import ipdb; ipdb.set_trace()
-                return return_error()
-    return decorated_function
+
 
 @app.route("/userLogged")
-@auth_required
 def userLogged(user=None):
     return user.username
 
@@ -150,8 +173,6 @@ def userLogged(user=None):
 def logout():
     logout_user()
     return ""
-
-from admin_constante_hyst   import AdminCsteHyst
 
 if __name__ == '__main__':
     app.run(debug=True, threaded=True, port=8932)

@@ -1,16 +1,29 @@
 import React, { Component } from "react";
 import ReactTable from 'react-table'
+import Websocket from 'react-websocket';
+import Fetcher from './Fetcher'
 
 class Home extends Component {
-  render() {
+  constructor(props) {
+      super(props);
+      this.state = { flights: [] };
+      this.fetchFlights();
 
-    var data = this.fetchFlights();
+      /*this.handleChange = this.handleChange.bind(this);
+      this.handleSubmit = this.handleSubmit.bind(this);*/
+    }
+
+    handleData(data) {
+      this.setState(data);
+    }
+
+  render() {
     const columns = [{
       Header: 'Time',
       accessor: 'time' // String-based value accessors!
     }, {
       Header: 'FlightNumber',
-      accessor: 'flight' // String-based value accessors!
+      accessor: 'flightNumber' // String-based value accessors!
     },
     {
       Header: 'Destination',
@@ -21,17 +34,23 @@ class Home extends Component {
       <div>
         <h2>Flight schedule</h2>
         <ReactTable
-          data={data}
+          data={this.state.flights}
           columns={columns}
         />
-
       </div>
     );
   }
 
   fetchFlights(){
-    const data=[{'time':'5:30', 'flight':'AC143', 'destination':'YPO'},{'time':'5:35', 'flight':'GC443', 'destination':'STO'}]
-    return data;
+    var fetcher = Fetcher.getInstance();
+    //fetcher.fetch('flights')
+    console.log('Fetching')
+    fetcher.fetch('flights')
+    .then(results => {
+      return results.json();
+    }).then(data => {
+      this.setState(data);
+    })
 
   }
 }

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Fetcher from './Fetcher'
 
 class Assign extends Component {
   constructor(props) {
@@ -7,6 +8,7 @@ class Assign extends Component {
 
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
+      this.fetchAssignation();
     }
 
   handleChange(event) {
@@ -18,7 +20,19 @@ class Assign extends Component {
   }
 
   handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.inputs);
+    //alert('The following flights are ' + this.state.inputs);
+    var fetcher = Fetcher.getInstance();
+    //fetcher.fetch('flights')
+    console.log('Sending results');
+    let formdata = new FormData();
+    formdata.append('values', JSON.stringify(this.state.inputs))
+    fetcher.postfetch('assign', formdata)
+    .then(results => {
+      return results.json();
+    }).then(data => {
+      console.log(data);
+    })
+
     event.preventDefault();
   }
 
@@ -37,6 +51,18 @@ class Assign extends Component {
                </button>
       </div>
     );
+  }
+
+  fetchAssignation(){
+    var fetcher = Fetcher.getInstance();
+    //fetcher.fetch('flights')
+    console.log('Fetching1')
+    fetcher.fetch('assign')
+    .then(results => {
+      return results.json();
+    }).then(data => {
+      this.setState({ inputs: Array(data.flightCount).join(".").split(".")});
+    })
   }
 
   appendInput() {
