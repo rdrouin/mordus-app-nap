@@ -8,9 +8,15 @@ from flask_login import LoginManager, login_required, login_user, logout_user, c
 from hashlib import md5
 from datetime import datetime
 from functools import wraps
-from db import db
-from vol import Vol
-from airport import Airport
+from db_model.db import db
+from db_model.vol import Vol
+from db_model.airport import Airport
+from db_model.admin_constante_hyst   import AdminCsteHyst
+from db_model.flightcompany   import FlightCompany
+from db_model.cap_pool import CapPool
+from db_model.cap_horaire import CapHoraire
+from db_model.group import Group
+from db_model.user import User
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -25,35 +31,6 @@ login_manager.login_view = 'login'
 
 CORS(app)
 
-class User(db.Model):
-    __tablename__ = "users"
-    id = db.Column('user_id',db.Integer , primary_key=True)
-    username = db.Column('username', db.String(20), unique=True , index=True)
-    password = db.Column('password' , db.String(10))
-    email = db.Column('email',db.String(50),unique=True , index=True)
-    registered_on = db.Column('registered_on' , db.DateTime)
-
-    def __init__(self , username ,password , email):
-        self.username = username
-        self.password = password
-        self.email = email
-        self.registered_on = datetime.utcnow()
-        self.access_token = "123"
-
-    def is_authenticated(self):
-        return True
-
-    def is_active(self):
-        return True
-
-    def is_anonymous(self):
-        return False
-
-    def get_id(self):
-        return chr(self.id)
-
-    def __repr__(self):
-        return '<User %r>' % (self.username)
 
 # TODO with postgresql
 h = md5()
@@ -81,14 +58,47 @@ def init_db():
     #drop
     db.create_all()
 
+
 @app.route('/populate', methods=['GET'])
 def populate():
     init_db()
     # populate all tables
+    for line in result:
+        vol = Vol(line['date'], line['heure'], line['noVol'], line['fc'], line['aeronef'], line['od'], line['secteur'])
+        db.session.add(vol)
+        db.session.commit()
 
-@app.route('/FlightCompany', methods=['GET'])
-def get_flightCompany():
-    return Vol.query.filter_by(fc).distinct()
+    for line in result:
+        airport = Airport(line['city'] , line['airportCode'],line['level2'],line['level3'])
+        db.session.add(airport)
+        db.session.commit()
+        result = csvreader("fc.csv")
+
+    for line in result:
+        fc = FlightCompany(line['id'], line['fc'])
+        db.session.add(fc)
+        db.session.commit()
+
+    for line in result:
+        cap_pool = CapPool(line['id_cap_pool'], line['cap_pool_name'])
+        db.session.add(cap_pool)
+        db.session.commit()
+
+    for line in result:
+        cap_horaire = CapHoraire(line['id_cap_horaire'], line['cap_value'], line['cap_timestamp'], line['user_id'])
+        db.session.add(cap_horaire)
+        db.session.commit()
+    for line in result:
+        group = CapHoraire(line['id_group'], line['group_name'], line['group_type'])
+        db.session.add(group)
+        db.session.commit()
+
+
+
+
+#@app.route('/FlightCompany', methods=['GET'])
+#def get_flightCompany():
+    #return Vol.query.filter_by(fc).distinct()
     #User.query.filter_by(username='peter').first()
 
 @app.route('/search/<searchText>', methods=['GET'])
@@ -151,7 +161,6 @@ def logout():
     logout_user()
     return ""
 
-from admin_constante_hyst   import AdminCsteHyst
 
 if __name__ == '__main__':
     app.run(debug=True, threaded=True, port=8932)

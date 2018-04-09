@@ -1,7 +1,6 @@
-from db import db
+from .db import db
 from csvreader import csvreader
 import datetime
-
 
 class Vol(db.Model):
     __tablename__ = "vol"
@@ -30,4 +29,3 @@ if __name__ == '__main__':
         vol = Vol(line['date'], line['heure'], line['noVol'], line['fc'], line['aeronef'], line['od'], line['secteur'])
         db.session.add(vol)
         db.session.commit()
-        flash('vol successfully registered')

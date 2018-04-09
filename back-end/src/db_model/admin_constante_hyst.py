@@ -1,5 +1,5 @@
 
-from db import db
+from .db import db
 class AdminCsteHyst(db.Model):
     __tablename__ = "admin_constante_hyst"
     id = db.Column('id',db.Integer , primary_key=True)
