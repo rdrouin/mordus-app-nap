@@ -3,6 +3,25 @@ body {
   font-family: sans-serif;
 }
 
+header, footer {
+    padding: 1em;
+    color: white;
+    background-color: black;
+    clear: left;
+    text-align: center;
+}
+
+ul#menu {
+  width: 100%;
+  margin:0;
+  padding:0;
+}
+
+ul#menu li {
+    display:inline;
+    text-align: center;
+}
+
 .pokemons__wrapper {
   position: relative;
   text-align: center;

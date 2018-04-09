@@ -3,6 +3,8 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Pokemon from '../components/Pokemon'
 import Search from '../components/Search'
+
+import ReactTable from 'react-table'
 import * as pageActions from '../actions/PageActions'
 
 class Page extends Component {
@@ -15,26 +17,35 @@ class Page extends Component {
   }
 
   render() {
-    let { displayedPokemons, isFetched } = this.props.page
 
-    let pokemons = displayedPokemons.map((pokemon, index) => {
-      return <Pokemon pokemon={pokemon} key={index} />
-    })
+    // TODO take data from server
+    const data = [{
+    hour: '5:30',
+    flight: 'DC1564',
+    destination: 'YPS'
+  },
+  {
+  hour: '5:35',
+  flight: 'AA9944',
+  destination: 'GBD'
+  }]
 
-    return (
-      <div className="pokemons__wrapper">
-        <Search onChange={this.handleSearch.bind(this)} />
-        <ul className="pokemons">
-          {
-            isFetched
-            ?
-            <p>Loading...</p>
-            :
-            pokemons
-          }
-        </ul>
-      </div>
-    )
+  const columns = [{
+    Header: 'Hour',
+    accessor: 'hour' // String-based value accessors!
+  }, {
+    Header: 'Flight number',
+    accessor: 'flight',
+    Cell: props => <span className='number'>{props.value}</span> // Custom cell components!
+  }, {
+    Header: 'Destination',
+    accessor: 'destination'
+  }]
+
+  return(<ReactTable
+    data={data}
+    columns={columns}
+  />)
   }
 }
 
