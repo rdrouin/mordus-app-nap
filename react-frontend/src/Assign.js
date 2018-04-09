@@ -4,7 +4,7 @@ import Fetcher from './Fetcher'
 class Assign extends Component {
   constructor(props) {
       super(props);
-      this.state = { inputs: ["text"] };
+      this.state = { inputs: [] };
 
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
@@ -46,9 +46,6 @@ class Assign extends Component {
                    </div>
                    <input type="submit" value="Submit" />
                </form>
-               <button onClick={ () => this.appendInput() }>
-                   CLICK ME TO ADD AN INPUT
-               </button>
       </div>
     );
   }
