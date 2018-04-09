@@ -1,6 +1,7 @@
 # Les Mordus du transport - App&Nap
 
-
+## Divers
+L'échéancier, la répartition des tâches et les risques sont sur le drive.
 
 ## Git Basics
 
