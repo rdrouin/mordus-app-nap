@@ -76,8 +76,18 @@ def index():
 def get_assets():
     return "no assets"
 
+@app.route('/init_db', methods=['GET'])
+def init_db():
+    #drop
+    db.create_all()
+
+@app.route('/populate', methods=['GET'])
+def populate():
+    init_db()
+    # populate all tables
+
 @app.route('/FlightCompany', methods=['GET'])
-def get_assets():
+def get_flightCompany():
     return Vol.query.filter_by(fc).distinct()
     #User.query.filter_by(username='peter').first()
 
