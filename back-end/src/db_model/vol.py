@@ -7,7 +7,7 @@ class Vol(db.Model):
     id = db.Column('id',db.Integer , primary_key=True)
     date = db.Column('date',db.String(20))
     heure = db.Column('heure', db.Time)
-    noVol = db.Column('noVol' , db.String(20))
+    noVol = db.Column('novol' , db.String(20))
     fc= db.Column('fc' , db.String(2))
     aeronef = db.Column('aeronef',db.String(10))
     od = db.Column('od' , db.String(10))
