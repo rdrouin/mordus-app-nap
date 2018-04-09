@@ -12,7 +12,7 @@ from functools import wraps
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postTrans@localhost:5432/postgres'
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
@@ -73,7 +73,7 @@ def get_assets():
 
 @app.route('/search/<searchText>', methods=['GET'])
 def get_searchTitles(searchText):
-    return "assets serach :" + str(searchText)
+    return "assets search :" + str(searchText)
 
 @app.route('/register' , methods=['POST'])
 def register():
@@ -132,4 +132,4 @@ def logout():
     return ""
 
 if __name__ == '__main__':
-    app.run(debug=True, threaded=True, host= '0.0.0.0', port=8932)
+    app.run(debug=True, threaded=True, port=8932)
