@@ -1,2 +1,1 @@
-npm install json-server
-pip install flask flask_cors flask-login flask_sqlalchemy psycopg2
+python setup.py install
