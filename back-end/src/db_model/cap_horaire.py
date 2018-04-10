@@ -4,7 +4,7 @@ class CapHoraire(db.Model):
     __tablename__ = "cap_horaire"
     id_cap_horaire = db.Column('id_cap_horaire',db.Integer , primary_key=True)
     cap_value = db.Column('cap_value',db.Integer)
-    cap_timestamp =db.Column('cap_value',db.DateTime)
+    cap_timestamp =db.Column('cap_timestamp',db.DateTime)
     user_id = db.Column('id_cap',db.Integer)
 
     def __init__(self ,cap_value,cap_timestamp,user_id):
