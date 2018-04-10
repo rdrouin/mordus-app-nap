@@ -4,6 +4,8 @@ from flask import Flask, jsonify, request, flash, redirect, url_for
 from flask_cors import CORS, cross_origin
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 
+import random
+
 
 from hashlib import md5
 from datetime import datetime
@@ -25,6 +27,7 @@ from db_model.group_reader import group_reader
 from db_model.user import User
 from db_model.regles_aff import RegleAff
 from db_model.regle_aff_reader import regle_aff_reader
+from db_model.user import populateUser
 
 
 app = Flask(__name__)
@@ -116,15 +119,13 @@ def populate():
         db.session.add(regle_aff)
     db.session.commit()
 
-
-
+    result = populateUser("../data/users.csv")
+    for line in result:
+        user = User(line['username'], line['password'], line['email'])
+        db.session.add(user)
+    db.session.commit()
 
     return redirect(url_for('index'))
-
-
-#@app.route('/FlightCompany', methods=['GET'])
-#def get_flightCompany():
-    #return Vol.query.filter_by(fc).distinct()
 
 @app.route('/flights', methods=['GET'])
 def flights():
@@ -142,7 +143,12 @@ def get_user():
     else:
         token = request.headers['Api_Access_Token']
         username = request.headers['Api_Username']
-        return username
+        user = User.query().filter_by(username=username).filter_by(token=token).first()
+        if user is not None:
+            return user.username
+        else:
+            print("Error")
+            return False
     return None
 
 @app.route('/assign', methods=['GET', 'POST'])
@@ -190,13 +196,19 @@ def login():
     username = request.form['username']
     password = request.form['password']
     print("login process")
-    registered_user = User.query.filter_by(username=username,password=password).first()
+    registered_user = User.query.filter_by(username=username).filter_by(password=password).first()
     if registered_user is None:
         print('Username or Password is invalid')
         flash('Username or Password is invalid' , 'error')
         return redirect(url_for('login'))
     login_user(registered_user)
-    return jsonify({'token': '123','username': registered_user.username})
+    token = int(random.random() * 2000) + 1;
+    registered_user.token = token
+    User.query.filter_by(username=username).filter_by(password=password).first().update({'token': token})
+    db.session.commit()
+
+
+    return jsonify({'token': registered_user.token,'username': registered_user.username})
 
 def return_error():
     return jsonify({'error': 'you do not have access'})

@@ -7,13 +7,14 @@ class User(db.Model):
     password = db.Column('password' , db.String(10))
     email = db.Column('email',db.String(50),unique=True , index=True)
     registered_on = db.Column('registered_on' , db.DateTime)
+    access_token = db.Column('token', db.Integer)
 
     def __init__(self , username ,password , email):
         self.username = username
         self.password = password
         self.email = email
         self.registered_on = datetime.utcnow()
-        self.access_token = "123"
+        self.access_token = "0"
 
     def is_authenticated(self):
         return True
@@ -29,3 +30,13 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % (self.username)
+
+import csv
+def populateUser(file):
+    table = []
+    with open(file, 'r') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=';')
+        next(spamreader, None)  # skip the headers
+        for row in spamreader:
+            table.append({"username":row[0],"password": row[1],"email": row[2]})
+    return table

@@ -31,7 +31,7 @@ class Main extends Component {
       super(props);
       this.myInstance = this;
       this.state = {isLogged: true};
-      //this.updateState();
+      this.updateState();
     }
 
   updateState(){
@@ -43,7 +43,7 @@ class Main extends Component {
     state['isAdmin'] = fetcher.isAdmin();
 
     this.setState(state);
-    
+
   }
 
   handler(e) {

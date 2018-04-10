@@ -4,7 +4,7 @@ export default class Fetcher {
 
     _userID = "";
     _token = "";
-    _admin = false;
+    _admin = true;
 
 
     /**
