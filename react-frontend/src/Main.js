@@ -12,6 +12,7 @@ import Login from "./Login";
 import Logout from "./Logout";
 import Fetcher from './Fetcher'
 import Capacity from './Capacity'
+import Alert from './Alert'
 
 class Main extends Component {
   static myInstance = null;
@@ -62,6 +63,7 @@ class Main extends Component {
           <li><NavLink exact to="/"><a aria-current="true" href="#/" class="active" hidden="true">Home</a></NavLink></li>
           <li><NavLink to="/assign"><a aria-current="true" href="#/assign" class="active">Assign</a></NavLink></li>
           <li><NavLink to="/contact"><a aria-current="true" href="#/contact" class="active">Contact</a></NavLink></li>
+          <li><NavLink to="/alert"><a aria-current="true" href="#/alert" class="active">Alert</a></NavLink></li>
           {this.state.isAdmin ? <li><NavLink to="/register"><a aria-current="true" href="#/register" class="active">Register</a></NavLink></li> : null}
           {!this.state.isLogged ?
             <li><NavLink to="/login"><a aria-current="true" href="#/login" class="active">Login</a></NavLink></li>:
@@ -73,6 +75,7 @@ class Main extends Component {
             <Route exact path="/" component={Home}/>
             <Route path="/assign" component={Assign}/>
             <Route path="/contact" component={Contact}/>
+            <Route path="/alert" component={Alert}/>
             {this.state.isAdmin ? <Route path="/register" component={Register}/> : null}
             {this.state.isNav ? <Route path="/nav" component={Capacity}/> : null}
             {!this.state.isLogged ? <Route path="/login" render={(props) => (

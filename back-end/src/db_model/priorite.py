@@ -7,12 +7,7 @@ class Priorite(db.Model):
     group_id =db.Column('group_id',db.String(50))
     rank = db.Column('rank',db.Integer)
 
-    def __init__(self ,id ,fc):
-        self.id=id
+    def __init__(self ,fc_code, group_id, rank):
         self.fc_code= fc_code
         self.group_id= group_id
         self.rank = rank
-    for line in result:
-        group = CapHoraire(line['id'], line['fc_code'], line['group_id'], line['rank'])
-        db.session.add(priorite)
-        db.session.commit()

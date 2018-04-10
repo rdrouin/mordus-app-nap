@@ -33,6 +33,9 @@ from db_model.regles_aff import RegleAff
 from db_model.regle_aff_reader import regle_aff_reader
 from db_model.user import populateUser
 from db_model.nav import Nav
+from db_model.priorite import Priorite
+from db_model.priorite_reader import priorite_reader
+from db_model.contingence import Contingence
 from settings import postUrl
 
 app = Flask(__name__)
@@ -142,6 +145,15 @@ def populate():
 
     db.session.commit()
 
+    result = priorite_reader("../data/priorite.csv")
+    for line in result:
+        print(line)
+        priorite = Priorite(line['fc_code'], line['group_id'], line['rank'])
+        db.session.add(priorite)
+        print(priorite)
+    db.session.commit()
+    print('not ok')
+
     return redirect(url_for('index'))
 
 @app.route('/flights', methods=['GET'])
@@ -168,6 +180,27 @@ def get_user():
             print("Error")
             return False
     return None
+
+@app.route('/alert', methods=['GET', 'POST'])
+def alert():
+    #user = get_user()
+    if request.method == 'GET':
+        capHoraires = CapHoraire.query.filter(CapHoraire.cap_timestamp < (datetime.utcnow() + timedelta(days=1))).filter((CapHoraire.cap_timestamp > datetime.utcnow()))
+        print(capHoraires)
+        data = {'alert' : []}
+        for capHoraire in capHoraires:
+            vols = Vol.query.filter_by(date='Mardi').filter(Vol.heure < (capHoraire.cap_timestamp + timedelta(hours=1)).__format__("%H:%M:%S")).filter(Vol.heure >= (capHoraire.cap_timestamp).__format__("%H:%M:%S")).all()
+            data['alert'].append({'cap_value':capHoraire.cap_value, 'cap_timestamp':capHoraire.cap_timestamp, 'demand': len(vols)})
+        return jsonify(data)
+    elif request.method == 'POST':
+        print('POST')
+        for key in request.args:
+            print(key)
+        timestamp_alert = request.form['alert']
+        contin = Contingence(datetime.strptime(timestamp_alert, "%a, %d %b %Y %H:%M:%S GMT"))
+        db.session.add(contin)
+        db.session.commit()
+        return jsonify({'data':'ok'})
 
 @app.route('/assign', methods=['GET', 'POST'])
 def assign():
