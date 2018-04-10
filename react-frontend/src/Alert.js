@@ -42,32 +42,26 @@ class Alert extends Component {
         return results.json();
       }).then(data => {
         if ('auth' in data) {
-          if (data['auth'] == 'ok'){
-            console.log(data)
-            var fetcher = Fetcher.getInstance();
-            fetcher.setUserID(data['username']);
-            fetcher.setUserToken(data['token']);
-            fetcher.setIsAdmin(data['isAdmin']);
-            fetcher.setIsNav(data['isNav']);
-            this.props.view();
-          }
+
+            console.log('pushe')
         }
-        this.props.history.push("/");
+
       })
 
+      this.props.history.push("/");
       event.preventDefault();
     }
 
     render() {
       const columns = [{
-      Header: 'Time',
+      Header: 'Heure',
       accessor: 'cap_timestamp' // String-based value accessors!
     }, {
-      Header: 'Capacity',
+      Header: 'Capacité',
       accessor: 'cap_value' // String-based value accessors!
     },
     {
-      Header: 'Demand',
+      Header: 'Demande',
       accessor: 'demand' // String-based value accessors!
     },
     {
@@ -78,7 +72,7 @@ class Alert extends Component {
 
     return (
       <div>
-        <h2>Flight schedule</h2>
+        <h2>Capacité en fonction des heures et des demandes</h2>
         <ReactTable
           data={this.state.alert}
           columns={columns}
@@ -97,6 +91,7 @@ class Alert extends Component {
         return results.json();
       }).then(data => {
         console.log(data)
+        this.props.history.push("/");
       })
     }
 

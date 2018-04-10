@@ -13,16 +13,8 @@ class Master extends Component {
       super(props);
       this.state = { username: "", password: ""};
 
-      this.handleChange = this.handleChange.bind(this);
+      this.handleFindelaContingence = this.handleFindelaContingence.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
-    }
-
-    handleChange(event) {
-      var index = event.target.id;
-      index = index.replace("input", "");
-      var state = this.state;
-      state[index] = event.target.value;
-      this.setState(state);
     }
 
     handleSubmit(event) {
@@ -31,8 +23,8 @@ class Master extends Component {
       .then(results => {
         return results.json();
       }).then(data => {
-            console.log(data)
-            this.props.history.push("/");
+            console.log(data);
+            this.returnHome();
       })
 
       event.preventDefault();
@@ -43,11 +35,17 @@ class Master extends Component {
       fetcher.postfetch('horloge2')
       .then(results => {
         return results.json();
+
       }).then(data => {
+          this.returnHome();
             console.log(data);
       })
 
       event.preventDefault();
+    }
+
+    returnHome(){
+      this.props.history.push("/");
     }
 
     render() {
@@ -55,9 +53,10 @@ class Master extends Component {
       if (!this.state.isLogged){
         return (
         <div>
-          <h2>Login</h2>
-          <button onClick={this.handleSubmit}>Fin de la ronde</button>
-          <button onClick={this.handleFindelaContingence}>Fin de la contingence</button>
+          <h2>Maître du temps</h2>
+          <button onClick={this.handleSubmit}>Fin de la ronde préliminaire</button>
+          <button onClick={this.handleFindelaContingence}>Fin de la deuxième ronde</button>
+          <button>Retour à l'état normal</button>
         </div>
       );
     }else {

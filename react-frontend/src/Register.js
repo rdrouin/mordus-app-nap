@@ -42,12 +42,12 @@ class Register extends Component {
       // TODO create a drop list for available carriers
       return (
         <div>
-          <h2>Register a new user</h2>
+          <h2>Créer un nouvel usager</h2>
           <form onSubmit={this.handleSubmit}>
-                         <label>Username: </label><input type="text" value={this.state.username} id="username" onChange={this.handleChange}/><br/>
-                         <label>Password: </label><input type="password" value={this.state.password} id="password" onChange={this.handleChange}/><br/>
-                         <label>Carrier: </label><input type="text" value={this.state.transporter} id="transporter" onChange={this.handleChange}/><br/>
-                     <input type="submit" value="Submit" />
+                         <label>Nom d'utilisateur: </label><input type="text" value={this.state.username} id="username" onChange={this.handleChange}/><br/>
+                         <label>Mot de passe: </label><input type="password" value={this.state.password} id="password" onChange={this.handleChange}/><br/>
+                         <label>Compagnie Aérienne: </label><input type="text" value={this.state.transporter} id="transporter" onChange={this.handleChange}/><br/>
+                     <input type="submit" value="Entrer" />
                  </form>
         </div>
       );

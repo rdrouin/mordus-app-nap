@@ -60,11 +60,11 @@ class Login extends Component {
       if (!this.state.isLogged){
         return (
         <div>
-          <h2>Login</h2>
+          <h2>Se connecter</h2>
           <form onSubmit={this.handleSubmit}>
-                         <label>Username: </label><input type="text" value={this.state.username} id="username" onChange={this.handleChange}/><br/>
-                         <label>Password: </label><input type="password" value={this.state.password} id="password" onChange={this.handleChange}/><br/>
-                     <input type="submit" value="Submit" />
+                         <label>Nom d'utilisateur: </label><input type="text" value={this.state.username} id="username" onChange={this.handleChange}/><br/>
+                         <label>Mot de passe: </label><input type="password" value={this.state.password} id="password" onChange={this.handleChange}/><br/>
+                     <input type="submit" value="Entrer" />
                  </form>
         </div>
       );

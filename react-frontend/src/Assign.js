@@ -3,6 +3,12 @@ import Fetcher from './Fetcher'
 import Select from 'react-select';
 import 'react-select/dist/react-select.css';
 
+import {
+  Route,
+  Redirect,
+  withRouter,
+} from "react-router-dom";
+
 class Assign extends Component {
   constructor(props) {
       super(props);
@@ -40,13 +46,14 @@ class Assign extends Component {
       console.log(data);
     })
 
+    this.props.history.push("/");
     event.preventDefault();
   }
 
   render() {
     return (
       <div>
-        <h2>Assign flights</h2>
+        <h2>Assigner des vols</h2>
         <form onSubmit={this.handleSubmit}>
                    <div id="dynamicInput">
                        {this.state.inputs.map((input, index)=> <Select
@@ -57,7 +64,7 @@ class Assign extends Component {
         options={this.state.options}
       />)}
                    </div>
-                   <input type="submit" value="Submit" />
+                   <input type="submit" value="Entrer" />
                </form>
       </div>
     );

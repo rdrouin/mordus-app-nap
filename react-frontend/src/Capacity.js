@@ -67,12 +67,12 @@ class Capacity extends Component {
       if (!this.state.isLogged){
         return (
         <div>
-          <h2>Login</h2>
+          <h2>Capacité</h2>
           <form onSubmit={this.handleSubmit}>
               <div id="dynamicInput">
                   {this.state.capacity.map((input, index)=> <div><label>{input.cap_timestamp}</label> <input type="text" value={input.cap_value} id={"input" + index} onChange={this.handleChange} /> <br/> </div>)}
               </div>
-                     <input type="submit" value="Submit" />
+                     <input type="submit" value="Entrer" />
                  </form>
         </div>
       );

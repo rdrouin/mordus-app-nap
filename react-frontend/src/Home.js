@@ -19,10 +19,10 @@ class Home extends Component {
 
   render() {
     const columns = [{
-      Header: 'Time',
+      Header: 'Heure',
       accessor: 'time' // String-based value accessors!
     }, {
-      Header: 'FlightNumber',
+      Header: 'Numéro du vol',
       accessor: 'flightNumber' // String-based value accessors!
     },
     {
@@ -36,7 +36,7 @@ class Home extends Component {
 
     return (
       <div>
-        <h2>Flight schedule</h2>
+        <h2>Départs</h2>
         <ReactTable
           data={this.state.flights}
           columns={columns}
