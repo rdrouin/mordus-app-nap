@@ -37,6 +37,7 @@ from db_model.priorite import Priorite
 from db_model.priorite_reader import priorite_reader
 from db_model.contingence import Contingence
 from settings import postUrl
+import subprocess
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
@@ -196,10 +197,12 @@ def alert():
         for key in request.args:
             print(key)
         timestamp_alert = request.form['alert']
+        Contingence.query.delete()
         contin = Contingence(datetime.strptime(timestamp_alert, "%a, %d %b %Y %H:%M:%S GMT"))
         db.session.add(contin)
         db.session.commit()
-        
+        subprocess.call("Rscript.exe routing/routing_algo_r.r", shell=True)
+
         return jsonify({'data':'ok'})
 
 @app.route('/assign', methods=['GET', 'POST'])
