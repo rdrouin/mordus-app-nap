@@ -1,6 +1,5 @@
 from .db import db
-from .vol_reader import vol_reader
-import datetime
+import csv
 
 class Vol(db.Model):
     __tablename__ = "vol"
@@ -12,8 +11,9 @@ class Vol(db.Model):
     aeronef = db.Column('aeronef',db.String(10))
     od = db.Column('od' , db.String(10))
     secteur = db.Column('secteur' , db.String(10))
+    status = db.Column('status' , db.String(20))
 
-    def __init__(self ,date ,heure ,noVol,fc, aeronef, od, secteur):
+    def __init__(self ,date ,heure ,noVol,fc, aeronef, od, secteur, status):
         self.date=date
         self.heure=heure
         self.noVol=noVol
@@ -21,3 +21,16 @@ class Vol(db.Model):
         self.aeronef=aeronef
         self.od=od
         self.secteur=secteur
+        self.status=status
+#import pandas
+def vol_reader(file):
+    table = []
+    with open(file, 'r') as csvfile:
+        volReader = csv.reader(csvfile, delimiter=';')
+        headers = volReader.__next__()
+        for row in volReader:
+            obj = {}
+            for i, h in enumerate(headers):
+                obj[h] = row[i]
+            table.append(obj)
+    return table

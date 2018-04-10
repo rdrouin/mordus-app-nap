@@ -14,8 +14,7 @@ from hashlib import md5
 from datetime import datetime
 from functools import wraps
 from db_model.db import db
-from db_model.vol import Vol
-from db_model.vol_reader import vol_reader
+from db_model.vol import *
 from db_model.airport import Airport
 from db_model.airport_reader import airport_reader
 from db_model.admin_constante_hyst   import AdminCsteHyst
@@ -37,6 +36,7 @@ from db_model.priorite import Priorite
 from db_model.priorite_reader import priorite_reader
 from db_model.contingence import Contingence
 from db_model.user_fc import User_Fc
+from db_model.att_conf import AttributionConfirme
 from settings import postUrl
 from db_model.att_prel import AttributionPreliminaire
 import subprocess
@@ -89,8 +89,9 @@ def populate():
 
     # populate all tables
     result = vol_reader("../data/vols.csv")
+    print(result)
     for line in result:
-        vol = Vol(line['date'], line['heure'], line['noVol'], line['fc'], line['aeronef'], line['od'], line['secteur'])
+        vol = Vol(line['date'], line['heure'], line['noVol'], line['noVol'][:2], line['aeronef'], line['od'], line['secteur'], line['status'])
         db.session.add(vol)
     db.session.commit()
 
@@ -279,6 +280,16 @@ def assign():
         if '' in acceptedFlights:
             acceptedFlights.remove('')
         print(acceptedFlights)
+        # TODO remove accepted from att_prel
+        # TODO add accepted to att_conf
+        for flight in acceptedFlights:
+            #Vol.query
+        #AttributionPreliminaire.query.filter(AttributionPreliminaire.)
+            print(flight)
+            x=  AttributionConfirme(flight, flight[:2])
+            db.session.add(x)
+        db.session.commit()
+
         return jsonify({'data':'ok'})
 
 @app.route('/capacity', methods=['GET', 'POST'])
