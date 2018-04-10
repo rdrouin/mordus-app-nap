@@ -40,9 +40,23 @@ class Home extends Component {
         <ReactTable
           data={this.state.flights}
           columns={columns}
+          getTrProps={this.getTrProps}
         />
       </div>
     );
+  }
+
+  getTrProps = (state, rowInfo, instance) => {
+    if (rowInfo) {
+      return {
+        style: {
+          background: rowInfo.row.status == 'rescheduled' ?
+            'rgba(255, 238, 117, 150)' : rowInfo.row.status == 'confirme'?
+            'rgba(5, 225, 119, 30)' : null,
+        }
+      }
+    }
+    return {};
   }
 
   fetchFlights(){

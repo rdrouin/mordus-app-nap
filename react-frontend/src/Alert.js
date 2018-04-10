@@ -59,10 +59,13 @@ class Alert extends Component {
     }, {
       Header: 'Capacité',
       accessor: 'cap_value' // String-based value accessors!
-    },
-    {
+    }, {
       Header: 'Demande',
       accessor: 'demand' // String-based value accessors!
+    }, {
+      id: 'ratio',
+      Header: 'Ratio',
+      accessor:  d => String((d.demand / d.cap_value * 100).toFixed(0)) + '%' // String-based value accessors!
     },
     {
         id: 'button',
@@ -76,10 +79,22 @@ class Alert extends Component {
         <ReactTable
           data={this.state.alert}
           columns={columns}
+          getTrProps={this.getTrProps}
         />
       </div>
     );
     }
+
+    getTrProps = (state, rowInfo, instance) => {
+    if (rowInfo) {
+      return {
+        style: {
+          background: rowInfo.row.ratio.substring(0, rowInfo.row.ratio.length -1) > 100 ? 'red' : null,
+        }
+      }
+    }
+    return {};
+  }
 
     editRow(id){
       var fetcher = Fetcher.getInstance();
