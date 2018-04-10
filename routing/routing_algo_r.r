@@ -32,24 +32,25 @@ capacity <- dbGetQuery(conn,"select * from cap_horaire") %>%
   mutate(cap_timestamp =  as.POSIXct(cap_timestamp, format = "%Y-%m-%d %H:%M")) %>% 
   filter(cap_timestamp == max(cap_timestamp)) %>% 
   mutate(group_name = "total_pool")
-dbDisconnect(conn)
+#dbDisconnect(conn)
 
 #read.csv(".\\tbl_algo_regles_affaire.csv", stringsAsFactors = FALSE)
-rules <- dbGetQuery(conn,"select * from regles_aff")
+rules <- dbGetQuery(conn,"select * from regle_aff")
 rules$drag_capacity_from[rules$drag_capacity_from == "total_pool"] <- "main_total_pool"
 rules$drag_capacity_to[rules$drag_capacity_to == "total_pool"] <- "main_total_pool"
 # rules <- rules[-1,]
-dbDisconnect(conn)
+#dbDisconnect(conn)
 
 #read.csv(".\\tbl_group.csv", stringsAsFactors = FALSE)
-groups <- dbGetQuery(conn,"select * from group") %>% 
+groups <- dbGetQuery(conn,"select * from priority_group") %>% 
   mutate(capacity = 0) %>% 
   rbind(capacity %>%
           mutate(id_group = 0,
+                 fc_code="zz",
                  group_type = "main",
                  group_class = "none",
                  capacity = cap_value) %>% 
-          select(id_group, group_name, group_type, group_class, capacity)) %>% 
+          select(id_group, fc_code, group_name, group_type, group_class, capacity)) %>% 
   mutate(group_name = paste0(group_type, "_", group_name))
 
 #3) Run règles d'affaires
@@ -152,6 +153,12 @@ for (i in i:i_max) {
   }
   
 } # end for
+
+
+groups <- groups[groups$capacity>0, ]
+groups$timestamp_open <- Sys.time()
+groups$timestamp_close <- Sys.time()+30*60
+groups$plage_horaire=1
 
 ## Send the assignation to the public server
 ## ÉCRIRE LE CODE

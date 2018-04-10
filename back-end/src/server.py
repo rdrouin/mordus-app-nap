@@ -109,7 +109,7 @@ def populate():
 
     result = group_reader("../data/group.csv")
     for line in result:
-        priority_group = Group(line['group_name'], line['group_type'])
+        priority_group = Group( line['fc_code'], line['group_name'],line['group_type'], line['group_class'])
         db.session.add(priority_group)
     db.session.commit()
 
