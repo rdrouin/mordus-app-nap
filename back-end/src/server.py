@@ -30,7 +30,7 @@ from db_model.regle_aff_reader import regle_aff_reader
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postTrans@localhost:5432/postgres'
 db.init_app(app)
 
 
