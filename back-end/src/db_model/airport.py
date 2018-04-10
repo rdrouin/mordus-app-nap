@@ -1,7 +1,7 @@
 
 from .db import db
 
-from airportsreader import csvreader
+from .airport_reader import airport_reader
 
 class Airport(db.Model):
     __tablename__ = "airport"
@@ -17,13 +17,3 @@ class Airport(db.Model):
             self.level=3
         else:
             print("probleme")
-
-
-
-if __name__ == '__main__':
-    result = csvreader("airports.csv")
-    for line in result:
-        airport = Airport(line['city'] , line['airportCode'],line['level2'],line['level3'])
-        db.session.add(airport)
-        db.session.commit()
-    print('airport successfully registered')
