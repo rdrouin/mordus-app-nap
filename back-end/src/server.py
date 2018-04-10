@@ -108,6 +108,15 @@ def populate():
         db.session.add(group)
     db.session.commit()
 
+    result = regle_aff_reader("../data/tbl_algo_regles_affaire.csv")
+    for line in result:
+        regle_aff = RegleAff(line['drag_capacity_from'], line['drag_capacity_to'], line['drag_type'], line['drag_value'],line['propagation'], line['condition_type'], line['condition_value'])
+        db.session.add(regle_aff)
+    db.session.commit()
+
+
+
+
     return redirect(url_for('index'))
 
 
