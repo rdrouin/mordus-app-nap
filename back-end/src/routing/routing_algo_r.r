@@ -1,4 +1,4 @@
-## Ce script vise √† effectuer l'ordonnancement de la capacit√© des vols
+## Ce script vise √ effectuer l'ordonnancement de la capacit√© des vols
 # 1) Packages
 library(dplyr)
 library(RPostgreSQL)
@@ -12,7 +12,7 @@ conn <- dbConnect(
   host = "localhost",
   port = "5432",
   user = "postgres",
-  password = "postgres"
+  password = "postTrans"
   
 )
 
@@ -28,10 +28,15 @@ conn <- dbConnect(
 
 
 #2) Fetch data
+plage_alerte <- dbGetQuery(conn,"select * from contingence;") %>% 
+  filter(id == max(id))
+
 capacity <- dbGetQuery(conn,"select * from cap_horaire") %>% 
-  mutate(cap_timestamp =  as.POSIXct(cap_timestamp, format = "%Y-%m-%d %H:%M")) %>% 
-  filter(cap_timestamp == max(cap_timestamp)) %>% 
-  mutate(group_name = "total_pool")
+  filter(cap_timestamp >= plage_alerte$timestamp_start,
+         cap_timestamp < plage_alerte$timestamp_end) %>% 
+  mutate(group_name = "total_pool") %>% 
+  group_by(group_name) %>% 
+  summarise(cap_value = sum(cap_value))
 #dbDisconnect(conn)
 
 #read.csv(".\\tbl_algo_regles_affaire.csv", stringsAsFactors = FALSE)
@@ -57,7 +62,7 @@ groups <- dbGetQuery(conn,"select * from priority_group") %>%
 # A) Set up constants 
 i <- 1
 i_max <- nrow(rules)
-# i_max <- 9
+ # i_max <- 6
 
 # B) Loop over each rule in rules
 for (i in i:i_max) {
@@ -125,9 +130,22 @@ for (i in i:i_max) {
     }
     
     ## Iterate on every item in items
-    items$capacity_to_add <- c(rep(1, groups$capacity[groups$group_name == rules$drag_capacity_to[i]]),
-                               rep(0, nrow(items) - groups$capacity[groups$group_name == rules$drag_capacity_to[i]])
-    )
+    items$capacity_to_add <- floor(groups$capacity[groups$group_name == rules$drag_capacity_to[i]] / nrow(items))
+    # items$capacity <- items$capacity + items$capacity_to_add
+    # items$capacity_to_add <- 0
+    
+    if(groups$capacity[groups$group_name == rules$drag_capacity_to[i]] %% nrow(items) > 0){
+      
+      items$capacity_to_add <- items$capacity_to_add +
+                                c(rep(1, groups$capacity[groups$group_name == rules$drag_capacity_to[i]] - 
+                                       floor(groups$capacity[groups$group_name == rules$drag_capacity_to[i]] / nrow(items))),
+                                 rep(0, nrow(items) -
+                                       groups$capacity[groups$group_name == rules$drag_capacity_to[i]] - 
+                                       floor(groups$capacity[groups$group_name == rules$drag_capacity_to[i]] / nrow(items)))
+                                 )
+    }
+    # items$capacity <- items$capacity + items$capacity_to_add
+    # items$capacity_to_add <- 0
     
     ## Remove capacity allocation
     groups$capacity[groups$group_name == rules$drag_capacity_to[i]] <- 0
@@ -157,11 +175,11 @@ for (i in i:i_max) {
 
 groups <- groups[groups$capacity>0, ]
 groups$timestamp_open <- Sys.time()
-groups$timestamp_close <- Sys.time()+30*60
-groups$plage_horaire=1
+groups$timestamp_close <- Sys.time()+30*60 # changer Èventuellement pour une valeur retrouvÈe dans la db
+groups$plage_horaire <- plage_alerte$id
 
 ## Send the assignation to the public server
-## √âCRIRE LE CODE
+## CRIRE LE CODE
 
 #attribution_prel
 dbWriteTable(conn, "att_prel", groups ,append=TRUE)
