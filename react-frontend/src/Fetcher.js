@@ -58,8 +58,8 @@ export default class Fetcher {
         method: method,
         headers: {
           Accept: 'application/json',
-          "api_username": 1,
-          "api_access_token" : "123",
+          "api_username": this._userID,
+          "api_access_token" : this._token,
         }
       })
     }

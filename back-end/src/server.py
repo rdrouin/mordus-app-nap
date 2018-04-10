@@ -28,12 +28,12 @@ from db_model.user import User
 from db_model.regles_aff import RegleAff
 from db_model.regle_aff_reader import regle_aff_reader
 from db_model.user import populateUser
-
+from settings import postUrl
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postTrans@localhost:5432/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = postUrl
 db.init_app(app)
 
 
@@ -143,7 +143,9 @@ def get_user():
     else:
         token = request.headers['Api_Access_Token']
         username = request.headers['Api_Username']
-        user = User.query().filter_by(username=username).filter_by(token=token).first()
+        print(token)
+        print(username)
+        user = User.query.filter_by(username=username).filter_by(access_token=token).first()
         if user is not None:
             return user.username
         else:
@@ -158,7 +160,7 @@ def assign():
         data = {'flightCount':0}
         data1 = {'flightCount':3}
         data2 = {'flightCount':1}
-        if user=="1":
+        if user=="admin":
             data = data1
         elif user=="2":
             data=data2
@@ -201,14 +203,14 @@ def login():
         print('Username or Password is invalid')
         flash('Username or Password is invalid' , 'error')
         return redirect(url_for('login'))
-    login_user(registered_user)
+
     token = int(random.random() * 2000) + 1;
-    registered_user.token = token
-    User.query.filter_by(username=username).filter_by(password=password).first().update({'token': token})
+    registered_user.access_token = token
     db.session.commit()
 
+    login_user(registered_user)
 
-    return jsonify({'token': registered_user.token,'username': registered_user.username})
+    return jsonify({'auth':'ok','token': registered_user.access_token,'username': registered_user.username})
 
 def return_error():
     return jsonify({'error': 'you do not have access'})
@@ -222,6 +224,10 @@ def userLogged(user=None):
 @app.route("/logout")
 @login_required
 def logout():
+    user = get_user()
+    registered_user = User.query.filter_by(username=user).first()
+    registered_user.access_token = 0
+    db.session.commit()
     logout_user()
     return ""
 

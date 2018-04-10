@@ -3,7 +3,9 @@ import Fetcher from './Fetcher'
 import Main from './Main'
 
 import {
+  Route,
   Redirect,
+  withRouter,
 } from "react-router-dom";
 
 class Login extends Component {
@@ -38,12 +40,14 @@ class Login extends Component {
       }).then(data => {
         if ('auth' in data) {
           if (data['auth'] == 'ok'){
-            fetcher.setUserID(this.state.username);
+            console.log(data)
+            var fetcher = Fetcher.getInstance();
+            fetcher.setUserID(data['username']);
             fetcher.setUserToken(data['token']);
             this.props.view();
           }
         }
-        console.log(data);
+        this.props.history.push("/");
       })
 
       event.preventDefault();
@@ -68,4 +72,4 @@ class Login extends Component {
     }
 }
 
-export default Login;
+export default withRouter(Login);
