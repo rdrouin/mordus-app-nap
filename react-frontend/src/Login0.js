@@ -8,7 +8,7 @@ import {
   withRouter,
 } from "react-router-dom";
 
-class Login extends Component {
+class Nav extends Component {
   constructor(props) {
       super(props);
       this.state = { username: "", password: ""};
@@ -74,4 +74,4 @@ class Login extends Component {
     }
 }
 
-export default withRouter(Login);
+export default withRouter(Nav);

@@ -11,6 +11,7 @@ import Register from "./Register";
 import Login from "./Login";
 import Logout from "./Logout";
 import Fetcher from './Fetcher'
+import Nav from './Login0'
 
 class Main extends Component {
   static myInstance = null;
@@ -41,6 +42,7 @@ class Main extends Component {
     console.log(fetcher.isLogged());
     state['isLogged'] = fetcher.isLogged();
     state['isAdmin'] = fetcher.isAdmin();
+    state['isNav'] = fetcher.isNav();
 
     this.setState(state);
 
@@ -64,12 +66,15 @@ class Main extends Component {
           {!this.state.isLogged ?
             <li><NavLink to="/login"><a aria-current="true" href="#/login" class="active">Login</a></NavLink></li>:
             <li><NavLink to="/logout"><a aria-current="true" href="#/logout" class="active">Logout</a></NavLink></li>}
+            {this.state.isNav ?
+              <li><NavLink to="/nav"><a aria-current="true" href="#/nav" class="active">Nav</a></NavLink></li>: null}
           </ul>
           <div className="content">
             <Route exact path="/" component={Home}/>
             <Route path="/assign" component={Assign}/>
             <Route path="/contact" component={Contact}/>
             {this.state.isAdmin ? <Route path="/register" component={Register}/> : null}
+            {this.state.isNav ? <Route path="/nav" component={Nav}/> : null}
             {!this.state.isLogged ? <Route path="/login" render={(props) => (
               <Login {...props} view={this.updateState.bind(this)} />)}/> :
             <Route path="/logout" render={(props) => (

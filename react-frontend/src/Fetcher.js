@@ -5,6 +5,7 @@ export default class Fetcher {
     _userID = "";
     _token = "";
     _admin = false;
+    _nav = false;
 
 
     /**
@@ -40,6 +41,14 @@ export default class Fetcher {
 
     setIsAdmin(isAdmin){
       this._admin = isAdmin;
+    }
+
+    setIsNav(isNav){
+      this._nav = isNav;
+    }
+
+    isNav(){
+      return this._nav;
     }
 
     isAdmin(){

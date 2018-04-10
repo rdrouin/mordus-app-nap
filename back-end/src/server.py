@@ -29,6 +29,7 @@ from db_model.admin import Admin
 from db_model.regles_aff import RegleAff
 from db_model.regle_aff_reader import regle_aff_reader
 from db_model.user import populateUser
+from db_model.nav import Nav
 from settings import postUrl
 
 app = Flask(__name__)
@@ -130,6 +131,11 @@ def populate():
             user = User.query.filter_by(username=line['username']).first()
             admin = Admin(user.id)
             db.session.add(admin)
+        if (line['isNav'].lower() == 'true'):
+            db.session.commit()
+            user = User.query.filter_by(username=line['username']).first()
+            nav = Nav(user.id)
+            db.session.add(nav)
 
     db.session.commit()
 
@@ -223,7 +229,12 @@ def login():
     if isAdminQuery != None:
         isAdmin = True
 
-    return jsonify({'auth':'ok','token': registered_user.access_token,'username': registered_user.username, 'isAdmin':isAdmin})
+    isNavQuery = Nav.query.filter_by(user_id=registered_user.id).first()
+    isNav = False
+    if isNavQuery != None:
+        isNav = True
+
+    return jsonify({'auth':'ok','token': registered_user.access_token,'username': registered_user.username, 'isAdmin':isAdmin, 'isNav':isNav})
 
 def return_error():
     return jsonify({'error': 'you do not have access'})
