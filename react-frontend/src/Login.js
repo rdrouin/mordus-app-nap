@@ -1,5 +1,10 @@
 import React, { Component } from "react";
 import Fetcher from './Fetcher'
+import Main from './Main'
+
+import {
+  Redirect,
+} from "react-router-dom";
 
 class Login extends Component {
   constructor(props) {
@@ -35,6 +40,7 @@ class Login extends Component {
           if (data['auth'] == 'ok'){
             fetcher.setUserID(this.state.username);
             fetcher.setUserToken(data['token']);
+            this.props.view();
           }
         }
         console.log(data);
@@ -45,7 +51,8 @@ class Login extends Component {
 
     render() {
       // TODO create a drop list for available carriers
-      return (
+      if (!this.state.isLogged){
+        return (
         <div>
           <h2>Login</h2>
           <form onSubmit={this.handleSubmit}>
@@ -55,6 +62,9 @@ class Login extends Component {
                  </form>
         </div>
       );
+    }else {
+        return <Redirect to='/' />
+      }
     }
 }
 

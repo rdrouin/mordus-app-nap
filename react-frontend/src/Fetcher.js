@@ -4,10 +4,11 @@ export default class Fetcher {
 
     _userID = "";
     _token = "";
+    _admin = false;
 
 
     /**
-     * @returns {CommonDataManager}
+     * @returns {Fetcher}
      */
     static getInstance() {
         if (this.myInstance == null) {
@@ -35,6 +36,10 @@ export default class Fetcher {
 
     isLogged(){
       return this._userID != "" && this._token != "";
+    }
+
+    isAdmin(){
+      return this._admin;
     }
 
     logout(){
