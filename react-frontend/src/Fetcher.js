@@ -3,6 +3,7 @@ export default class Fetcher {
     static myInstance = null;
 
     _userID = "";
+    _token = "";
 
 
     /**
@@ -22,6 +23,29 @@ export default class Fetcher {
 
     setUserID(id) {
         this._userID = id;
+    }
+
+    getUserToken() {
+        return this._token;
+    }
+
+    setUserToken(token) {
+        this._token = token;
+    }
+
+    isLogged(){
+      return this._userID != "" && this._token != "";
+    }
+
+    logout(){
+      if (this._userID != ""){
+        this._userID = "";
+        this._token = "";
+        return true;
+      }
+      else {
+        return false;
+      }
     }
 
     fetch(url, method='get'){
