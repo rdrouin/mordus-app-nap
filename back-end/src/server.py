@@ -109,8 +109,8 @@ def populate():
 
     result = group_reader("../data/group.csv")
     for line in result:
-        group = Group(line['group_name'], line['group_type'])
-        db.session.add(group)
+        priority_group = Group(line['group_name'], line['group_type'])
+        db.session.add(priority_group)
     db.session.commit()
 
     result = regle_aff_reader("../data/tbl_algo_regles_affaire.csv")
