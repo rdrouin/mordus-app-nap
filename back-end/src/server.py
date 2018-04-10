@@ -205,6 +205,43 @@ def alert():
 
         return jsonify({'data':'ok'})
 
+
+@app.route('/rules', methods=['GET', 'POST'])
+def rules():
+    #user = get_user()
+    if request.method == 'GET':
+        rules = RegleAff.query.order_by(RegleAff.id).all()
+        data = {'rules' : []}
+        for rule in rules:
+            data['rules'].append({'id':rule.id,
+                                    'drag_capacity_from':rule.drag_capacity_from,
+                                    'drag_capacity_to':rule.drag_capacity_to,
+                                    'drag_type':rule.drag_type,
+                                    'drag_value':rule.drag_value,
+                                    'propagation':rule.propagation,
+                                    'condition_type':rule.condition_type,
+                                    'condition_value':rule.condition_value,})
+        return jsonify(data)
+    elif request.method == 'POST':
+        print('POST')
+        for key in request.args:
+            print(key)
+        rules = json.loads(request.form['rules'])
+        RegleAff.query.delete()
+        for rule in rules:
+            print(rule)
+            regle = RegleAff(rule['drag_capacity_from'],
+                rule['drag_capacity_to'],
+                rule['drag_type'],
+                rule['drag_value'],
+                rule['propagation'],
+                rule['condition_type'],
+                rule['condition_value'])
+            db.session.add(regle)
+        db.session.commit()
+
+        return jsonify({'data':'ok'})
+
 @app.route('/assign', methods=['GET', 'POST'])
 def assign():
     user = get_user()
