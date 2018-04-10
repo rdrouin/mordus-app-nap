@@ -4,7 +4,7 @@ export default class Fetcher {
 
     _userID = "";
     _token = "";
-    _admin = true;
+    _admin = false;
 
 
     /**
@@ -38,6 +38,10 @@ export default class Fetcher {
       return this._userID != "" && this._token != "";
     }
 
+    setIsAdmin(isAdmin){
+      this._admin = isAdmin;
+    }
+
     isAdmin(){
       return this._admin;
     }
@@ -46,6 +50,7 @@ export default class Fetcher {
       if (this._userID != ""){
         this._userID = "";
         this._token = "";
+        this._admin = false;
         return true;
       }
       else {

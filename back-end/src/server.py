@@ -25,6 +25,7 @@ from db_model.cap_horaire_reader import cap_horaire_reader
 from db_model.group import Group
 from db_model.group_reader import group_reader
 from db_model.user import User
+from db_model.admin import Admin
 from db_model.regles_aff import RegleAff
 from db_model.regle_aff_reader import regle_aff_reader
 from db_model.user import populateUser
@@ -122,7 +123,14 @@ def populate():
     result = populateUser("../data/users.csv")
     for line in result:
         user = User(line['username'], line['password'], line['email'])
+        print(line['isAdmin'])
         db.session.add(user)
+        if (line['isAdmin'].lower() == 'true'):
+            db.session.commit()
+            user = User.query.filter_by(username=line['username']).first()
+            admin = Admin(user.id)
+            db.session.add(admin)
+
     db.session.commit()
 
     return redirect(url_for('index'))
@@ -210,7 +218,12 @@ def login():
 
     login_user(registered_user)
 
-    return jsonify({'auth':'ok','token': registered_user.access_token,'username': registered_user.username})
+    isAdminQuery = Admin.query.filter_by(user_id=registered_user.id).first()
+    isAdmin = False
+    if isAdminQuery != None:
+        isAdmin = True
+
+    return jsonify({'auth':'ok','token': registered_user.access_token,'username': registered_user.username, 'isAdmin':isAdmin})
 
 def return_error():
     return jsonify({'error': 'you do not have access'})

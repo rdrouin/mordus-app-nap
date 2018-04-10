@@ -44,6 +44,7 @@ class Login extends Component {
             var fetcher = Fetcher.getInstance();
             fetcher.setUserID(data['username']);
             fetcher.setUserToken(data['token']);
+            fetcher.setIsAdmin(data['isAdmin']);
             this.props.view();
           }
         }
