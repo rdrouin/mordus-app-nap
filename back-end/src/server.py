@@ -36,7 +36,9 @@ from db_model.nav import Nav
 from db_model.priorite import Priorite
 from db_model.priorite_reader import priorite_reader
 from db_model.contingence import Contingence
+from db_model.user_fc import User_Fc
 from settings import postUrl
+from db_model.att_prel import AttributionPreliminaire
 import subprocess
 
 app = Flask(__name__)
@@ -143,6 +145,11 @@ def populate():
             user = User.query.filter_by(username=line['username']).first()
             nav = Nav(user.id)
             db.session.add(nav)
+        if (line['fc'] != ''):
+            db.session.commit()
+            user = User.query.filter_by(username=line['username']).first()
+            nav = User_Fc(user.id, line['fc'])
+            db.session.add(nav)
 
     db.session.commit()
 
@@ -153,7 +160,7 @@ def populate():
         db.session.add(priorite)
         print(priorite)
     db.session.commit()
-    print('not ok')
+
 
     return redirect(url_for('index'))
 
@@ -246,19 +253,31 @@ def rules():
 def assign():
     user = get_user()
     if request.method == 'GET':
-        data = {'flightCount':0}
-        data1 = {'flightCount':3}
-        data2 = {'flightCount':1}
-        if user=="admin":
-            data = data1
-        elif user=="2":
-            data=data2
+        user = User.query.filter_by(username=user).first()
+        user_fc_relation = User_Fc.query.filter_by(user_id=user.id).first()
+        atts = AttributionPreliminaire.query.filter_by(fc_code=user_fc_relation.fc).all()
+        i = 0
+        for att in atts:
+            i += att.capacity
+
+        timestamp_begin = Contingence.query.first().timestamp_start.__format__("%H:%M:%S");
+        timestamp_end = Contingence.query.first().timestamp_end.__format__("%H:%M:%S");
+
+        vols = Vol.query.filter_by(date='Mardi').filter(Vol.heure < timestamp_end).filter(Vol.heure > timestamp_begin).filter_by(fc=user_fc_relation.fc).all()
+        noVols = [];
+        for vol in vols:
+            noVols.append({'value': vol.noVol, 'label': vol.noVol})
+
+        data = {'flightCount':i, 'flights': noVols}
         return jsonify(data)
     elif request.method == 'POST':
         print('POST')
         for key in request.args:
             print(key)
-        acceptedFlights = request.form['values']
+        acceptedFlights = list(set(json.loads(request.form['values'])))
+
+        if '' in acceptedFlights:
+            acceptedFlights.remove('')
         print(acceptedFlights)
         return jsonify({'data':'ok'})
 

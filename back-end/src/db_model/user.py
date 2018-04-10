@@ -38,5 +38,5 @@ def populateUser(file):
         spamreader = csv.reader(csvfile, delimiter=';')
         next(spamreader, None)  # skip the headers
         for row in spamreader:
-            table.append({"username":row[0],"password": row[1],"email": row[2], "isAdmin": row[3], "isNav": row[4]})
+            table.append({"username":row[0],"password": row[1],"email": row[2], "isAdmin": row[3], "isNav": row[4], "fc": row[5]})
     return table
