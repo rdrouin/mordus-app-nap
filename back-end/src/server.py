@@ -7,6 +7,8 @@ from flask_login import LoginManager, login_required, login_user, logout_user, c
 import json
 import random
 
+from datetime import datetime, timedelta,time
+
 
 from hashlib import md5
 from datetime import datetime
@@ -144,11 +146,10 @@ def populate():
 
 @app.route('/flights', methods=['GET'])
 def flights():
-    data = {'flights':[{'time':'5:30', 'flightNumber':'AC130', 'destination':'YPO'},
-    {'time':'6:30', 'flightNumber':'AB230', 'destination':'GHR'},
-    {'time':'6:40', 'flightNumber':'AS550', 'destination':'DSW'},
-    {'time':'6:55', 'flightNumber':'AG840', 'destination':'HGR'},
-    {'time':'7:10', 'flightNumber':'AW430', 'destination':'NBV'}]}
+    data = {'flights':[]};
+    vols = Vol.query.filter_by(date='Mardi').all()
+    for vol in vols:
+        data['flights'].append({'time':vol.heure.__format__("%H:%M:%S"), 'flightNumber':vol.noVol, 'destination':vol.od})
 
     return jsonify(data)
 
@@ -192,7 +193,7 @@ def assign():
 def capacity():
     user = get_user()
     if request.method == 'GET':
-        capHoraires = CapHoraire.query.all()
+        capHoraires = CapHoraire.query.filter(CapHoraire.cap_timestamp < datetime.utcnow() + timedelta(days=1)).filter(CapHoraire.cap_timestamp > datetime.utcnow())
         print(capHoraires)
         data = {'capacity' : []}
         for capHoraire in capHoraires:
