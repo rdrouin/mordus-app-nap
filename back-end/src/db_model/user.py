@@ -13,7 +13,7 @@ class User(db.Model):
         self.username = username
         self.password = password
         self.email = email
-        self.registered_on = datetime.utcnow()
+        self.registered_on = datetime.now()
         self.access_token = "0"
 
     def is_authenticated(self):

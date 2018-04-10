@@ -185,8 +185,7 @@ def get_user():
 def alert():
     #user = get_user()
     if request.method == 'GET':
-        capHoraires = CapHoraire.query.filter(CapHoraire.cap_timestamp < (datetime.utcnow() + timedelta(days=1))).filter((CapHoraire.cap_timestamp > datetime.utcnow()))
-        print(capHoraires)
+        capHoraires = CapHoraire.query.filter(CapHoraire.cap_timestamp < (datetime.now() + timedelta(days=1))).filter((CapHoraire.cap_timestamp > datetime.now())).all()
         data = {'alert' : []}
         for capHoraire in capHoraires:
             vols = Vol.query.filter_by(date='Mardi').filter(Vol.heure < (capHoraire.cap_timestamp + timedelta(hours=1)).__format__("%H:%M:%S")).filter(Vol.heure >= (capHoraire.cap_timestamp).__format__("%H:%M:%S")).all()
@@ -200,6 +199,7 @@ def alert():
         contin = Contingence(datetime.strptime(timestamp_alert, "%a, %d %b %Y %H:%M:%S GMT"))
         db.session.add(contin)
         db.session.commit()
+        
         return jsonify({'data':'ok'})
 
 @app.route('/assign', methods=['GET', 'POST'])
@@ -226,7 +226,7 @@ def assign():
 def capacity():
     user = get_user()
     if request.method == 'GET':
-        capHoraires = CapHoraire.query.filter(CapHoraire.cap_timestamp < datetime.utcnow() + timedelta(days=1)).filter(CapHoraire.cap_timestamp > datetime.utcnow())
+        capHoraires = CapHoraire.query.filter(CapHoraire.cap_timestamp < datetime.now() + timedelta(days=1)).filter(CapHoraire.cap_timestamp > datetime.now())
         print(capHoraires)
         data = {'capacity' : []}
         for capHoraire in capHoraires:
