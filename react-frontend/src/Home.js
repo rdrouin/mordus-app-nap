@@ -28,6 +28,10 @@ class Home extends Component {
     {
       Header: 'Destination',
       accessor: 'destination' // String-based value accessors!
+    },
+    {
+      Header: 'Type',
+      accessor: 'status' // String-based value accessors!
     }]
 
     return (

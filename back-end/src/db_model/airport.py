@@ -16,4 +16,4 @@ class Airport(db.Model):
         elif level3=='Yes':
             self.level=3
         else:
-            print("probleme")
+            pass

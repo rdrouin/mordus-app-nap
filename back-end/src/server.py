@@ -89,7 +89,7 @@ def populate():
 
     # populate all tables
     result = vol_reader("../data/vols.csv")
-    print(result)
+    #print(result)
     for line in result:
         vol = Vol(line['date'], line['heure'], line['noVol'], line['noVol'][:2], line['aeronef'], line['od'], line['secteur'], line['status'])
         db.session.add(vol)
@@ -134,7 +134,7 @@ def populate():
     result = populateUser("../data/users.csv")
     for line in result:
         user = User(line['username'], line['password'], line['email'])
-        print(line['isAdmin'])
+        #print(line['isAdmin'])
         db.session.add(user)
         if (line['isAdmin'].lower() == 'true'):
             db.session.commit()
@@ -156,10 +156,10 @@ def populate():
 
     result = priorite_reader("../data/priorite.csv")
     for line in result:
-        print(line)
+        #print(line)
         priorite = Priorite(line['fc_code'], line['group_id'], line['rank'])
         db.session.add(priorite)
-        print(priorite)
+        #print(priorite)
     db.session.commit()
 
 
@@ -170,7 +170,7 @@ def flights():
     data = {'flights':[]};
     vols = Vol.query.filter_by(date='Mardi').all()
     for vol in vols:
-        data['flights'].append({'time':vol.heure.__format__("%H:%M:%S"), 'flightNumber':vol.noVol, 'destination':vol.od})
+        data['flights'].append({'time':vol.heure.__format__("%H:%M:%S"), 'flightNumber':vol.noVol, 'destination':vol.od, 'status':vol.status})
 
     return jsonify(data)
 
@@ -180,15 +180,60 @@ def get_user():
     else:
         token = request.headers['Api_Access_Token']
         username = request.headers['Api_Username']
-        print(token)
-        print(username)
+        #print(token)
+        #print(username)
         user = User.query.filter_by(username=username).filter_by(access_token=token).first()
         if user is not None:
             return user.username
         else:
-            print("Error")
+            #print("Error")
             return False
     return None
+
+@app.route('/horloge', methods=['POST'])
+def horloge():
+    # changer status de la table
+    countConfirme = 0;
+    confirmed = AttributionConfirme.query.all();
+    countConfirme = len(confirmed)
+    for confirme in confirmed:
+        vol = Vol.query.filter_by(date='Mardi').filter_by(noVol=confirme.vol_id).first()
+        vol.status = 'confirme'
+
+        db.session.delete(confirme)
+        db.session.commit()
+    db.session.commit()
+
+    prelim = AttributionPreliminaire.query.all();
+    countCapacity = 0
+    for pre in prelim:
+        countCapacity += pre.capacity
+
+    countCapacity -= countConfirme
+    print('il reste  ' + str(countCapacity) + 'places')
+    return jsonify({'data':'ok'})
+
+@app.route('/horloge2', methods=['POST'])
+def horloge2():
+    # changer status de la table
+    countConfirme = 0;
+    AttributionPreliminaire.query.delete();
+    timestamp_end = Contingence.query.first().timestamp_end.__format__("%H:%M:%S");
+    vols = Vol.query.filter_by(date='Mardi').filter(Vol.heure < timestamp_end).filter_by(status='planifie').all()
+    for vol in vols:
+        vol.status = 'rescheduled'
+        vol.heure = timestamp_end
+        db.session.commit()
+    db.session.commit()
+
+    prelim = AttributionPreliminaire.query.all();
+    countCapacity = 0
+    for pre in prelim:
+        countCapacity += pre.capacity
+
+    countCapacity -= countConfirme
+    print('il reste  ' + str(countCapacity) + 'places')
+    return jsonify({'data':'ok'})
 
 @app.route('/alert', methods=['GET', 'POST'])
 def alert():
@@ -201,9 +246,7 @@ def alert():
             data['alert'].append({'cap_value':capHoraire.cap_value, 'cap_timestamp':capHoraire.cap_timestamp, 'demand': len(vols)})
         return jsonify(data)
     elif request.method == 'POST':
-        print('POST')
-        for key in request.args:
-            print(key)
+        #print('POST')
         timestamp_alert = request.form['alert']
         Contingence.query.delete()
         contin = Contingence(datetime.strptime(timestamp_alert, "%a, %d %b %Y %H:%M:%S GMT"))
@@ -231,13 +274,10 @@ def rules():
                                     'condition_value':rule.condition_value,})
         return jsonify(data)
     elif request.method == 'POST':
-        print('POST')
-        for key in request.args:
-            print(key)
         rules = json.loads(request.form['rules'])
         RegleAff.query.delete()
         for rule in rules:
-            print(rule)
+            #print(rule)
             regle = RegleAff(rule['drag_capacity_from'],
                 rule['drag_capacity_to'],
                 rule['drag_type'],
@@ -272,9 +312,6 @@ def assign():
         data = {'flightCount':i, 'flights': noVols}
         return jsonify(data)
     elif request.method == 'POST':
-        print('POST')
-        for key in request.args:
-            print(key)
         acceptedFlights = list(set(json.loads(request.form['values'])))
 
         if '' in acceptedFlights:
@@ -283,11 +320,7 @@ def assign():
         # TODO remove accepted from att_prel
         # TODO add accepted to att_conf
         for flight in acceptedFlights:
-            #Vol.query
-        #AttributionPreliminaire.query.filter(AttributionPreliminaire.)
-            print(flight)
-            x=  AttributionConfirme(flight, flight[:2])
-            db.session.add(x)
+            db.session.add(AttributionConfirme(flight, flight[:2]))
         db.session.commit()
 
         return jsonify({'data':'ok'})
@@ -297,16 +330,11 @@ def capacity():
     user = get_user()
     if request.method == 'GET':
         capHoraires = CapHoraire.query.filter(CapHoraire.cap_timestamp < datetime.now() + timedelta(days=1)).filter(CapHoraire.cap_timestamp > datetime.now())
-        print(capHoraires)
         data = {'capacity' : []}
         for capHoraire in capHoraires:
             data['capacity'].append({'cap_value':capHoraire.cap_value, 'cap_timestamp':capHoraire.cap_timestamp, 'user_id':capHoraire.user_id})
         return jsonify(data)
     elif request.method == 'POST':
-        print('POST')
-        for key in request.args:
-            print(key)
-        print(request.form['json'])
         data = json.loads(request.form['json'])
         CapHoraire.query.delete()
         db.session.commit()
@@ -340,10 +368,8 @@ def register():
 def login():
     username = request.form['username']
     password = request.form['password']
-    print("login process")
     registered_user = User.query.filter_by(username=username).filter_by(password=password).first()
     if registered_user is None:
-        print('Username or Password is invalid')
         flash('Username or Password is invalid' , 'error')
         return redirect(url_for('login'))
 

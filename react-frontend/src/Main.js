@@ -14,6 +14,7 @@ import Fetcher from './Fetcher'
 import Capacity from './Capacity'
 import Alert from './Alert'
 import Rules from './Rules'
+import Master from './Master'
 
 class Main extends Component {
   static myInstance = null;
@@ -66,6 +67,7 @@ class Main extends Component {
           <li><NavLink to="/contact"><a aria-current="true" href="#/contact" class="active">Contact</a></NavLink></li>
           <li><NavLink to="/alert"><a aria-current="true" href="#/alert" class="active">Alert</a></NavLink></li>
           <li><NavLink to="/rules"><a aria-current="true" href="#/rules" class="active">Rules</a></NavLink></li>
+          <li><NavLink to="/master"><a aria-current="true" href="#/master" class="active">Master</a></NavLink></li>
           {this.state.isAdmin ? <li><NavLink to="/register"><a aria-current="true" href="#/register" class="active">Register</a></NavLink></li> : null}
           {!this.state.isLogged ?
             <li><NavLink to="/login"><a aria-current="true" href="#/login" class="active">Login</a></NavLink></li>:
@@ -79,6 +81,7 @@ class Main extends Component {
             <Route path="/contact" component={Contact}/>
             <Route path="/alert" component={Alert}/>
             <Route path="/rules" component={Rules}/>
+            <Route path="/master" component={Master}/>
             {this.state.isAdmin ? <Route path="/register" component={Register}/> : null}
             {this.state.isNav ? <Route path="/nav" component={Capacity}/> : null}
             {!this.state.isLogged ? <Route path="/login" render={(props) => (
