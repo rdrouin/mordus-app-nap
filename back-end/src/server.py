@@ -23,12 +23,14 @@ from db_model.cap_horaire_reader import cap_horaire_reader
 from db_model.group import Group
 from db_model.group_reader import group_reader
 from db_model.user import User
+from db_model.regles_aff import RegleAff
+from db_model.regle_aff_reader import regle_aff_reader
 
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postTrans@localhost:5432/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/postgres'
 db.init_app(app)
 
 

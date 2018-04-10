@@ -4,7 +4,8 @@ from .db import db
 from .regle_aff_reader import regle_aff_reader
 class RegleAff(db.Model):
     __tablename__ = "regle_aff"
-    drag_capacity_from = db.Column('drag_capacity_from',db.String(100) , primary_key=True)
+    id = db.Column('id',db.Integer , primary_key=True)
+    drag_capacity_from = db.Column('drag_capacity_from',db.String(100))
     drag_capacity_to = db.Column('drag_capacity_to',db.String(100))
     drag_type =  db.Column('drag_type',db.String(100))
     drag_value =  db.Column('drag_value',db.Float)
