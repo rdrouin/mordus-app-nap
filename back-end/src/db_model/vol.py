@@ -1,5 +1,5 @@
 from .db import db
-from csvreader import csvreader
+from .vol_reader import vol_reader
 import datetime
 
 class Vol(db.Model):
@@ -21,11 +21,3 @@ class Vol(db.Model):
         self.aeronef=aeronef
         self.od=od
         self.secteur=secteur
-
-
-if __name__ == '__main__':
-    result = csvreader("vols.csv")
-    for line in result:
-        vol = Vol(line['date'], line['heure'], line['noVol'], line['fc'], line['aeronef'], line['od'], line['secteur'])
-        db.session.add(vol)
-        db.session.commit()

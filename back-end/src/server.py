@@ -10,19 +10,25 @@ from datetime import datetime
 from functools import wraps
 from db_model.db import db
 from db_model.vol import Vol
+from db_model.vol_reader import vol_reader
 from db_model.airport import Airport
+from db_model.airport_reader import airport_reader
 from db_model.admin_constante_hyst   import AdminCsteHyst
 from db_model.flightcompany   import FlightCompany
+from db_model.fc_reader import fc_reader
 from db_model.cap_pool import CapPool
+from db_model.cap_pool_reader import cap_pool_reader
 from db_model.cap_horaire import CapHoraire
+from db_model.cap_horaire_reader import cap_horaire_reader
 from db_model.group import Group
+from db_model.group_reader import group_reader
 from db_model.user import User
-from csvreader import csvreader
+
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/postgres'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postTrans@localhost:5432/postgres'
 db.init_app(app)
 
 
@@ -55,46 +61,54 @@ def get_assets():
 
 @app.route('/init_db', methods=['GET'])
 def init_db():
-    #drop
+    db.reflect()
+    db.drop_all()
     db.create_all()
+    return redirect(url_for('index'))
 
 
 @app.route('/populate', methods=['GET'])
 def populate():
     init_db()
-    return redirect(url_for('index'))
+
     # populate all tables
+    result = vol_reader("../data/vols.csv")
     for line in result:
         vol = Vol(line['date'], line['heure'], line['noVol'], line['fc'], line['aeronef'], line['od'], line['secteur'])
         db.session.add(vol)
-        db.session.commit()
+    db.session.commit()
 
+    result = airport_reader("../data/airports.csv")
     for line in result:
         airport = Airport(line['city'] , line['airportCode'],line['level2'],line['level3'])
         db.session.add(airport)
-        db.session.commit()
-        result = csvreader("fc.csv")
+    db.session.commit()
 
+    result = fc_reader("../data/fc.csv")
     for line in result:
-        fc = FlightCompany(line['id'], line['fc'])
+        fc = FlightCompany( line['fc'])
         db.session.add(fc)
-        db.session.commit()
+    db.session.commit()
 
+    result = cap_pool_reader("../data/cap_pool.csv")
     for line in result:
-        cap_pool = CapPool(line['id_cap_pool'], line['cap_pool_name'])
+        cap_pool = CapPool(line['cap_pool_name'])
         db.session.add(cap_pool)
-        db.session.commit()
+    db.session.commit()
 
+    result = cap_horaire_reader("../data/cap_horaire.csv")
     for line in result:
-        cap_horaire = CapHoraire(line['id_cap_horaire'], line['cap_value'], line['cap_timestamp'], line['user_id'])
+        cap_horaire = CapHoraire(line['cap_value'], line['cap_timestamp'], line['user_id'])
         db.session.add(cap_horaire)
-        db.session.commit()
+    db.session.commit()
+
+    result = group_reader("../data/group.csv")
     for line in result:
-        group = CapHoraire(line['id_group'], line['group_name'], line['group_type'])
+        group = Group(line['group_name'], line['group_type'])
         db.session.add(group)
-        db.session.commit()
+    db.session.commit()
 
-
+    return redirect(url_for('index'))
 
 
 #@app.route('/FlightCompany', methods=['GET'])
