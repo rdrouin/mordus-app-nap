@@ -4,7 +4,7 @@ export default class Fetcher {
 
     _userID = "";
     _token = "";
-    _admin = true;
+    _admin = false;
 
 
     /**
@@ -38,6 +38,10 @@ export default class Fetcher {
       return this._userID != "" && this._token != "";
     }
 
+    setIsAdmin(isAdmin){
+      this._admin = isAdmin;
+    }
+
     isAdmin(){
       return this._admin;
     }
@@ -46,6 +50,7 @@ export default class Fetcher {
       if (this._userID != ""){
         this._userID = "";
         this._token = "";
+        this._admin = false;
         return true;
       }
       else {
@@ -58,8 +63,8 @@ export default class Fetcher {
         method: method,
         headers: {
           Accept: 'application/json',
-          "api_username": 1,
-          "api_access_token" : "123",
+          "api_username": this._userID,
+          "api_access_token" : this._token,
         }
       })
     }
