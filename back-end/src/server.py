@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request, flash, redirect, url_for
 from flask_cors import CORS, cross_origin
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 
+import json
 import random
 
 
@@ -185,6 +186,30 @@ def assign():
             print(key)
         acceptedFlights = request.form['values']
         print(acceptedFlights)
+        return jsonify({'data':'ok'})
+
+@app.route('/capacity', methods=['GET', 'POST'])
+def capacity():
+    user = get_user()
+    if request.method == 'GET':
+        capHoraires = CapHoraire.query.all()
+        print(capHoraires)
+        data = {'capacity' : []}
+        for capHoraire in capHoraires:
+            data['capacity'].append({'cap_value':capHoraire.cap_value, 'cap_timestamp':capHoraire.cap_timestamp, 'user_id':capHoraire.user_id})
+        return jsonify(data)
+    elif request.method == 'POST':
+        print('POST')
+        for key in request.args:
+            print(key)
+        print(request.form['json'])
+        data = json.loads(request.form['json'])
+        CapHoraire.query.delete()
+        db.session.commit()
+        for cap in data['capacity']:
+            cap = CapHoraire(int(cap['cap_value']), cap['cap_timestamp'], cap['user_id'])
+            db.session.add(cap)
+        db.session.commit()
         return jsonify({'data':'ok'})
 
 

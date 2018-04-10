@@ -8,21 +8,35 @@ import {
   withRouter,
 } from "react-router-dom";
 
-class Nav extends Component {
+class Capacity extends Component {
   constructor(props) {
       super(props);
-      this.state = { username: "", password: ""};
+      this.state = {'capacity' : []};
 
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
+      this.fetchCapacities()
     }
 
     handleChange(event) {
       var index = event.target.id;
       index = index.replace("input", "");
       var state = this.state;
-      state[index] = event.target.value;
+      state['capacity'][index]['cap_value'] = event.target.value;
       this.setState(state);
+    }
+
+    fetchCapacities(){
+      var fetcher = Fetcher.getInstance();
+      //fetcher.fetch('flights')
+      console.log('Fetching1')
+      fetcher.fetch('capacity')
+      .then(results => {
+        return results.json();
+      }).then(data => {
+        console.log(data);
+        this.setState(data);
+      })
     }
 
     handleSubmit(event) {
@@ -30,23 +44,16 @@ class Nav extends Component {
       var fetcher = Fetcher.getInstance();
       //fetcher.fetch('flights')
       console.log('Sending results');
+      console.log(this.state);
       let formdata = new FormData();
-      formdata.append('username', this.state.username)
-      formdata.append('password', this.state.password)
-      formdata.append('transporter', this.state.transporter)
-      fetcher.postfetch('login', formdata)
+      formdata.append('json', JSON.stringify(this.state))
+      fetcher.postfetch('capacity', formdata)
       .then(results => {
         return results.json();
       }).then(data => {
         if ('auth' in data) {
           if (data['auth'] == 'ok'){
             console.log(data)
-            var fetcher = Fetcher.getInstance();
-            fetcher.setUserID(data['username']);
-            fetcher.setUserToken(data['token']);
-            fetcher.setIsAdmin(data['isAdmin']);
-            fetcher.setIsNav(data['isNav']);
-            this.props.view();
           }
         }
         this.props.history.push("/");
@@ -62,8 +69,9 @@ class Nav extends Component {
         <div>
           <h2>Login</h2>
           <form onSubmit={this.handleSubmit}>
-                         <label>Username: </label><input type="text" value={this.state.username} id="username" onChange={this.handleChange}/><br/>
-                         <label>Password: </label><input type="password" value={this.state.password} id="password" onChange={this.handleChange}/><br/>
+              <div id="dynamicInput">
+                  {this.state.capacity.map((input, index)=> <div><label>{input.cap_timestamp}</label> <input type="text" value={input.cap_value} id={"input" + index} onChange={this.handleChange} /> <br/> </div>)}
+              </div>
                      <input type="submit" value="Submit" />
                  </form>
         </div>
@@ -74,4 +82,4 @@ class Nav extends Component {
     }
 }
 
-export default withRouter(Nav);
+export default withRouter(Capacity);
